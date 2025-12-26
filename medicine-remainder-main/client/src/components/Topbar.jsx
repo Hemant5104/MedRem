@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import api from "../services/api";
 import {
   FiBell,
   FiChevronDown,
@@ -8,6 +9,7 @@ import { MdHealthAndSafety } from "react-icons/md";
 
 const Topbar = ({ title }) => {
   const [time, setTime] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const updateTime = () => {
@@ -24,6 +26,27 @@ const Topbar = ({ title }) => {
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = await api.get("/profile");
+        setUser(res.data);
+      } catch (e) {
+        // silently ignore
+      }
+    };
+    loadProfile();
+  }, []);
+
+  const initials = (() => {
+    const name = user?.name || "";
+    if (!name) return "U";
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0]?.[0] || "";
+    const second = parts.length > 1 ? parts[1]?.[0] || "" : "";
+    return (first + second).toUpperCase() || first.toUpperCase() || "U";
+  })();
 
   return (
     <header
@@ -68,12 +91,12 @@ const Topbar = ({ title }) => {
         {/* PROFILE */}
         <div className="flex items-center gap-3 cursor-pointer group">
           <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-teal-400 to-indigo-500 flex items-center justify-center text-sm font-bold shadow">
-            SS
+            {initials}
           </div>
 
           <div className="hidden md:flex flex-col leading-tight">
             <span className="text-sm font-medium text-white">
-              Suresh Sau
+              {user?.name || "User"}
             </span>
             <span className="text-xs text-gray-400">
               Patient

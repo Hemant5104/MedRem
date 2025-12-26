@@ -29,6 +29,7 @@ const Dashboard = () => {
   const [todayLogs, setTodayLogs] = useState([]);
   const [historyLogs, setHistoryLogs] = useState([]);
   const [loadingAction, setLoadingAction] = useState(null);
+  const [user, setUser] = useState(null);
 
   // ---------------- LOAD DATA ----------------
   const loadData = async () => {
@@ -50,6 +51,16 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = await api.get("/profile");
+        setUser(res.data);
+      } catch {}
+    };
+    loadProfile();
   }, []);
 
   // ---------------- REFRESH LOGS ----------------
@@ -173,7 +184,7 @@ const Dashboard = () => {
 
         {/* HEADER */}
         <div>
-          <h1 className="text-2xl font-bold">Welcome back, Suresh 👋</h1>
+          <h1 className="text-2xl font-bold">Welcome back, {user?.name || "User"} 👋</h1>
           <p className="text-sm text-gray-400">
             Your medicine & health overview
           </p>
